@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 type RequestState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -76,60 +77,83 @@ export default function DemoPage() {
   };
 
   return (
-    <main className="page-wrap">
-      <section className="card">
-        <h1>Demo</h1>
-        <p>Select a dog image and run recognition.</p>
+    <main className="demo-page">
+      <div className="container">
+        <nav className="top-nav" aria-label="Demo navigation">
+          <p className="brand">Dog Breed AI</p>
+          <Link to="/" className="button button-secondary nav-demo-link">
+            Back to Home
+          </Link>
+        </nav>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(event) => {
-            const nextFile = event.target.files?.[0] ?? null;
-            setPredictions([]);
+        <section className="card-block demo-card">
+          <h1>Try the Demo</h1>
+          <p className="demo-subtitle">Upload a dog image and run recognition.</p>
 
-            if (!nextFile) {
-              setFile(null);
-              setState('error');
-              setErrorMessage('Please select an image file.');
-              return;
-            }
+          <label className="upload-zone" htmlFor="dog-image-upload">
+            <span className="upload-title">Choose an image</span>
+            <span className="upload-hint">PNG or JPG image, up to 5MB recommended.</span>
+            <span className="upload-file-name">{file ? file.name : 'No file selected yet'}</span>
+          </label>
 
-            if (!nextFile.type.startsWith('image/')) {
-              setFile(null);
-              setState('error');
-              setErrorMessage('Please select a valid image file.');
-              return;
-            }
+          <input
+            id="dog-image-upload"
+            className="file-input"
+            type="file"
+            accept="image/*"
+            onChange={(event) => {
+              const nextFile = event.target.files?.[0] ?? null;
+              setPredictions([]);
 
-            setFile(nextFile);
-            setState('idle');
-            setErrorMessage('');
-          }}
-        />
+              if (!nextFile) {
+                setFile(null);
+                setState('error');
+                setErrorMessage('Please select an image file.');
+                return;
+              }
 
-        <button type="button" onClick={onRecognize} disabled={state === 'loading'}>
-          {state === 'loading' ? 'Processing...' : 'Recognize'}
-        </button>
+              if (!nextFile.type.startsWith('image/')) {
+                setFile(null);
+                setState('error');
+                setErrorMessage('Please select a valid image file.');
+                return;
+              }
 
-        {state === 'loading' && <p>Loading...</p>}
+              setFile(nextFile);
+              setState('idle');
+              setErrorMessage('');
+            }}
+          />
 
-        <div aria-live="polite" className="error-area">
-          {state === 'error' && <p>{errorMessage}</p>}
-        </div>
+          <button type="button" onClick={onRecognize} disabled={state === 'loading'} className="button button-primary">
+            {state === 'loading' ? 'Processing...' : 'Recognize'}
+          </button>
 
-        <div className="results-area">
-          {state === 'success' && (
-            <ul>
-              {predictions.map((item, index) => (
-                <li key={`${item.label}-${index}`}>
-                  {index + 1}. <strong>{item.label}</strong>: {Math.round(item.score * 100) + '%'}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
+          {state === 'loading' && <p className="status-text">Loading...</p>}
+
+          <div aria-live="polite" className="error-area">
+            {state === 'error' && <p>{errorMessage}</p>}
+          </div>
+
+          <div className="results-area">
+            {state === 'success' && (
+              <section className="result-card" aria-label="Prediction results">
+                <h2>Top predictions</h2>
+                <ul>
+                  {predictions.map((item, index) => (
+                    <li key={`${item.label}-${index}`}>
+                      <span>
+                        {index + 1}. {item.label}
+                      </span>
+                      <strong>{Math.round(item.score * 100) + '%'}</strong>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
