@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 
+type DogImage = { index: number; src: string };
+
 const dogImageModules = import.meta.glob('../assets/Dog_??.*', {
   eager: true,
   import: 'default'
@@ -10,24 +12,32 @@ const dogImages = Object.entries(dogImageModules)
     const match = path.match(/Dog_(\d{2})\.[^.]+$/);
     return match ? { index: Number(match[1]), src } : null;
   })
-  .filter((image): image is { index: number; src: string } => image !== null)
+  .filter((image): image is DogImage => image !== null)
   .sort((a, b) => a.index - b.index);
 
 const heroImage = dogImages[0];
-const galleryImages = dogImages.slice(1);
+const cardImages = dogImages.slice(1);
+
+const getCardImage = (fallbackIndex: number) => cardImages[fallbackIndex] ?? heroImage;
 
 const howItWorksSteps = [
   {
     title: 'Upload an image',
-    description: 'Choose a clear photo of your dog from your device in the demo page.'
+    description: 'Choose a clear photo of your dog from your device in the demo page.',
+    alt: 'Шаг 1: загрузка фото',
+    image: getCardImage(0)
   },
   {
     title: 'Run recognition',
-    description: 'Our model processes the image and detects the most likely breeds.'
+    description: 'Our model processes the image and detects the most likely breeds.',
+    alt: 'Шаг 2: распознавание',
+    image: getCardImage(1)
   },
   {
     title: 'Review Top predictions',
-    description: 'See ranked breed predictions with confidence percentages in seconds.'
+    description: 'See ranked breed predictions with confidence percentages in seconds.',
+    alt: 'Шаг 3: результат',
+    image: getCardImage(2)
   }
 ];
 
@@ -38,7 +48,10 @@ const features = [
   'Clean workflow from upload to result',
   'Built for easy testing and iteration',
   'Responsive interface across devices'
-];
+].map((title, index) => ({
+  title,
+  image: getCardImage(index + howItWorksSteps.length)
+}));
 
 export default function LandingPage() {
   return (
@@ -78,6 +91,7 @@ export default function LandingPage() {
           <div className="grid grid-3">
             {howItWorksSteps.map((step, index) => (
               <article key={step.title} className="card-block step-card">
+                {step.image ? <img className="step-card-image" src={step.image.src} alt={step.alt} /> : null}
                 <p className="step-number">Step {index + 1}</p>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
@@ -90,23 +104,12 @@ export default function LandingPage() {
           <h2>Why this is useful</h2>
           <div className="grid grid-3">
             {features.map((feature) => (
-              <article key={feature} className="card-block feature-card">
-                <h3>{feature}</h3>
+              <article key={feature.title} className="card-block feature-card">
+                {feature.image ? (
+                  <img className="feature-card-image" src={feature.image.src} alt="Иллюстрация функции" />
+                ) : null}
+                <h3>{feature.title}</h3>
               </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="section">
-          <h2>Примеры изображений</h2>
-          <div className="grid gallery-grid">
-            {galleryImages.map((image) => (
-              <img
-                key={image.index}
-                className="gallery-image"
-                src={image.src}
-                alt={`Пример изображения собаки №${image.index}`}
-              />
             ))}
           </div>
         </section>
