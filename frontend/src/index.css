@@ -180,13 +180,20 @@ button:disabled {
   padding: 20px;
 }
 
+.step-card-image-frame {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
 .step-card-image {
   width: 100%;
-  height: 130px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 12px;
+  object-position: center;
   display: block;
-  margin-bottom: 12px;
 }
 
 .step-number {
@@ -213,12 +220,26 @@ button:disabled {
   min-height: 96px;
 }
 
-.feature-card-image {
-  width: 64px;
-  height: 64px;
+.feature-card-image-frame {
+  width: clamp(56px, 18vw, 72px);
+  aspect-ratio: 1 / 1;
   flex-shrink: 0;
-  object-fit: cover;
+  overflow: hidden;
   border-radius: 10px;
+}
+
+.feature-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+@media (min-width: 760px) {
+  .feature-card-image-frame {
+    width: 72px;
+  }
 }
 
 .privacy-card p {
