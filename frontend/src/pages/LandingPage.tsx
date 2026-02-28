@@ -1,5 +1,21 @@
 import { Link } from 'react-router-dom';
 
+const dogImageModules = import.meta.glob('../assets/Dog_??.*', {
+  eager: true,
+  import: 'default'
+}) as Record<string, string>;
+
+const dogImages = Object.entries(dogImageModules)
+  .map(([path, src]) => {
+    const match = path.match(/Dog_(\d{2})\.[^.]+$/);
+    return match ? { index: Number(match[1]), src } : null;
+  })
+  .filter((image): image is { index: number; src: string } => image !== null)
+  .sort((a, b) => a.index - b.index);
+
+const heroImage = dogImages[0];
+const galleryImages = dogImages.slice(1);
+
 const howItWorksSteps = [
   {
     title: 'Upload an image',
@@ -36,20 +52,25 @@ export default function LandingPage() {
         </nav>
 
         <section className="hero card-block">
-          <p className="eyebrow">Dog Breed Recognition Service</p>
-          <h1>Identify dog breeds from a photo in seconds.</h1>
-          <p className="hero-subtitle">
-            Upload one image and get clear breed predictions with confidence scores from our
-            model-powered API.
-          </p>
-          <div className="hero-actions">
-            <Link to="/demo" className="button button-primary">
-              Try Demo
-            </Link>
-            <a href="#how-it-works" className="button button-secondary">
-              How it works
-            </a>
+          <div className="hero-content">
+            <p className="eyebrow">Dog Breed Recognition Service</p>
+            <h1>Identify dog breeds from a photo in seconds.</h1>
+            <p className="hero-subtitle">
+              Upload one image and get clear breed predictions with confidence scores from our
+              model-powered API.
+            </p>
+            <div className="hero-actions">
+              <Link to="/demo" className="button button-primary">
+                Try Demo
+              </Link>
+              <a href="#how-it-works" className="button button-secondary">
+                How it works
+              </a>
+            </div>
           </div>
+          {heroImage ? (
+            <img className="hero-image" src={heroImage.src} alt="Пример изображения собаки" />
+          ) : null}
         </section>
 
         <section id="how-it-works" className="section">
@@ -72,6 +93,20 @@ export default function LandingPage() {
               <article key={feature} className="card-block feature-card">
                 <h3>{feature}</h3>
               </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section">
+          <h2>Примеры изображений</h2>
+          <div className="grid gallery-grid">
+            {galleryImages.map((image) => (
+              <img
+                key={image.index}
+                className="gallery-image"
+                src={image.src}
+                alt={`Пример изображения собаки №${image.index}`}
+              />
             ))}
           </div>
         </section>
