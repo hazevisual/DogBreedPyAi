@@ -91,7 +91,11 @@ export default function LandingPage() {
           <div className="grid grid-3">
             {howItWorksSteps.map((step, index) => (
               <article key={step.title} className="card-block step-card">
-                {step.image ? <img className="step-card-image" src={step.image.src} alt={step.alt} /> : null}
+                {step.image ? (
+                  <div className="step-card-image-frame">
+                    <img className="step-card-image" src={step.image.src} alt={step.alt} />
+                  </div>
+                ) : null}
                 <p className="step-number">Step {index + 1}</p>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
@@ -106,7 +110,9 @@ export default function LandingPage() {
             {features.map((feature) => (
               <article key={feature.title} className="card-block feature-card">
                 {feature.image ? (
-                  <img className="feature-card-image" src={feature.image.src} alt="Иллюстрация функции" />
+                  <div className="feature-card-image-frame">
+                    <img className="feature-card-image" src={feature.image.src} alt="Иллюстрация функции" />
+                  </div>
                 ) : null}
                 <h3>{feature.title}</h3>
               </article>
