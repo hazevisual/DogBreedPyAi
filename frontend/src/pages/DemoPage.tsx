@@ -1,4 +1,5 @@
 import { type ChangeEvent, useState } from 'react';
+import loaderVideo from '../assets/AiLoading.mp4';
 
 type RequestState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -7,14 +8,11 @@ type Prediction = {
   score: number;
 };
 
-const LOADER_ASSET_PATH = '/src/assets/loader.gif';
-
 export default function DemoPage() {
   const [file, setFile] = useState<File | null>(null);
   const [state, setState] = useState<RequestState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [predictions, setPredictions] = useState<Prediction[]>([]);
-  const [showLoaderAsset, setShowLoaderAsset] = useState(true);
 
   const onRecognize = async () => {
     if (state === 'loading') {
@@ -86,7 +84,6 @@ export default function DemoPage() {
     setFile(nextFile);
     setState('idle');
     setErrorMessage('');
-    setShowLoaderAsset(true);
   };
 
   return (
@@ -129,16 +126,14 @@ export default function DemoPage() {
             {state === 'loading' && (
               <section className="loading-block" aria-live="polite" aria-label="Выполняется распознавание">
                 <div className="loading-animation-slot" aria-hidden="true">
-                  {showLoaderAsset ? (
-                    <img
-                      src={LOADER_ASSET_PATH}
-                      alt=""
-                      className="loading-animation"
-                      onError={() => setShowLoaderAsset(false)}
-                    />
-                  ) : (
-                    <span className="loading-fallback">Добавьте frontend/src/assets/loader.gif</span>
-                  )}
+                  <video
+                    src={loaderVideo}
+                    autoPlay
+                    muted
+                    playsInline
+                    preload="auto"
+                    className="loading-animation"
+                  />
                 </div>
                 <p className="loading-title">Нейросеть анализирует изображение...</p>
                 <p className="loading-caption">Обычно это занимает несколько секунд.</p>
