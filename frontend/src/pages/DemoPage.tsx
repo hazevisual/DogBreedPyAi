@@ -21,14 +21,14 @@ export default function DemoPage() {
 
     if (!file) {
       setState('error');
-      setErrorMessage('Please select an image file.');
+      setErrorMessage('Пожалуйста, выберите изображение.');
       setPredictions([]);
       return;
     }
 
     if (!file.type.startsWith('image/')) {
       setState('error');
-      setErrorMessage('Please select a valid image file.');
+      setErrorMessage('Нужен файл изображения (JPG, PNG, WebP).');
       setPredictions([]);
       return;
     }
@@ -47,53 +47,42 @@ export default function DemoPage() {
       });
 
       if (response.status !== 200) {
-        let message = 'Prediction failed.';
-
-        try {
-          const errorData = (await response.json()) as { message?: string };
-          if (errorData.message) {
-            message = errorData.message;
-          }
-        } catch {
-          // Keep default message when response JSON parsing fails.
-        }
-
         setState('error');
-        setErrorMessage(message);
+        setErrorMessage('Не удалось выполнить распознавание.');
         return;
       }
 
       const data = (await response.json()) as { predictions?: Prediction[] };
-      const sortedPredictions = [...(data.predictions ?? [])].sort(
-        (a, b) => b.score - a.score
-      );
+      const sortedPredictions = [...(data.predictions ?? [])].sort((a, b) => b.score - a.score);
 
       setPredictions(sortedPredictions);
       setState('success');
     } catch {
       setState('error');
-      setErrorMessage('Server is not available.');
+      setErrorMessage('Сервер недоступен.');
     }
   };
 
   return (
     <main className="demo-page">
       <div className="container">
-        <nav className="top-nav" aria-label="Demo navigation">
-          <p className="brand">Dog Breed AI</p>
+        <nav className="top-nav" aria-label="Навигация демо">
+          <p className="brand">Распознавание пород собак</p>
           <Link to="/" className="button button-secondary nav-demo-link">
-            Back to Home
+            Назад
           </Link>
         </nav>
 
         <section className="card-block demo-card">
-          <h1>Try the Demo</h1>
-          <p className="demo-subtitle">Upload a dog image and run recognition.</p>
+          <h1>Демо распознавания</h1>
+          <p className="demo-subtitle">Загрузите изображение собаки и запустите распознавание.</p>
 
           <label className="upload-zone" htmlFor="dog-image-upload">
-            <span className="upload-title">Choose an image</span>
-            <span className="upload-hint">PNG or JPG image, up to 5MB recommended.</span>
-            <span className="upload-file-name">{file ? file.name : 'No file selected yet'}</span>
+            <span className="upload-title">Выберите изображение</span>
+            <span className="upload-hint">
+              Поддерживаются форматы JPG, PNG, WebP. Максимальный размер — 5 МБ.
+            </span>
+            <span className="upload-file-name">{file ? file.name : 'Файл пока не выбран'}</span>
           </label>
 
           <input
@@ -108,14 +97,14 @@ export default function DemoPage() {
               if (!nextFile) {
                 setFile(null);
                 setState('error');
-                setErrorMessage('Please select an image file.');
+                setErrorMessage('Пожалуйста, выберите изображение.');
                 return;
               }
 
               if (!nextFile.type.startsWith('image/')) {
                 setFile(null);
                 setState('error');
-                setErrorMessage('Please select a valid image file.');
+                setErrorMessage('Нужен файл изображения (JPG, PNG, WebP).');
                 return;
               }
 
@@ -125,11 +114,16 @@ export default function DemoPage() {
             }}
           />
 
-          <button type="button" onClick={onRecognize} disabled={state === 'loading'} className="button button-primary">
-            {state === 'loading' ? 'Processing...' : 'Recognize'}
+          <button
+            type="button"
+            onClick={onRecognize}
+            disabled={state === 'loading'}
+            className="button button-primary"
+          >
+            {state === 'loading' ? 'Обработка...' : 'Распознать'}
           </button>
 
-          {state === 'loading' && <p className="status-text">Loading...</p>}
+          {state === 'loading' && <p className="status-text">Обработка...</p>}
 
           <div aria-live="polite" className="error-area">
             {state === 'error' && <p>{errorMessage}</p>}
@@ -137,8 +131,8 @@ export default function DemoPage() {
 
           <div className="results-area">
             {state === 'success' && (
-              <section className="result-card" aria-label="Prediction results">
-                <h2>Top predictions</h2>
+              <section className="result-card" aria-label="Результаты распознавания">
+                <h2>Результат</h2>
                 <ul>
                   {predictions.map((item, index) => (
                     <li key={`${item.label}-${index}`}>
