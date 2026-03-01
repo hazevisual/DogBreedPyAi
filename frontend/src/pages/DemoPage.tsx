@@ -173,7 +173,9 @@ export default function DemoPage() {
       {state === 'loading' && (
         <div className="loader-overlay" aria-live="polite" aria-label="Выполняется распознавание" role="status">
           <div className="loader-modal">
-            <video src={loaderVideo} autoPlay muted playsInline preload="auto" className="loader-modal-video" />
+            <div className="loader-video-frame">
+              <video src={loaderVideo} autoPlay muted playsInline preload="auto" className="loader-modal-video" />
+            </div>
             <h3>Нейросеть анализирует изображение...</h3>
             <p>Обычно это занимает несколько секунд</p>
           </div>
