@@ -1,4 +1,4 @@
-import { type ChangeEvent, useState } from 'react';
+import { type ChangeEvent, useEffect, useState } from 'react';
 import loaderVideo from '../assets/AiLoading.mp4';
 
 type RequestState = 'idle' | 'loading' | 'success' | 'error';
@@ -13,6 +13,19 @@ export default function DemoPage() {
   const [state, setState] = useState<RequestState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [predictions, setPredictions] = useState<Prediction[]>([]);
+
+  useEffect(() => {
+    if (state === 'loading') {
+      document.body.classList.add('loader-lock-scroll');
+      return;
+    }
+
+    document.body.classList.remove('loader-lock-scroll');
+
+    return () => {
+      document.body.classList.remove('loader-lock-scroll');
+    };
+  }, [state]);
 
   const onRecognize = async () => {
     if (state === 'loading') {
@@ -123,23 +136,6 @@ export default function DemoPage() {
               disabled={state === 'loading'}
             />
 
-            {state === 'loading' && (
-              <section className="loading-block" aria-live="polite" aria-label="Выполняется распознавание">
-                <div className="loading-animation-slot" aria-hidden="true">
-                  <video
-                    src={loaderVideo}
-                    autoPlay
-                    muted
-                    playsInline
-                    preload="auto"
-                    className="loading-animation"
-                  />
-                </div>
-                <p className="loading-title">Нейросеть анализирует изображение...</p>
-                <p className="loading-caption">Обычно это занимает несколько секунд.</p>
-              </section>
-            )}
-
             <div className="recognize-button-wrap">
               <button
                 type="button"
@@ -173,6 +169,16 @@ export default function DemoPage() {
           </div>
         </section>
       </div>
+
+      {state === 'loading' && (
+        <div className="loader-overlay" aria-live="polite" aria-label="Выполняется распознавание" role="status">
+          <div className="loader-modal">
+            <video src={loaderVideo} autoPlay muted playsInline preload="auto" className="loader-modal-video" />
+            <h3>Нейросеть анализирует изображение...</h3>
+            <p>Обычно это занимает несколько секунд</p>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

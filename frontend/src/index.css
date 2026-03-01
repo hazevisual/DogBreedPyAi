@@ -35,6 +35,10 @@ body {
   color: var(--text);
 }
 
+body.loader-lock-scroll {
+  overflow: hidden;
+}
+
 h1,
 h2,
 h3,
@@ -192,52 +196,51 @@ button:disabled {
   max-width: 320px;
 }
 
-.loading-block {
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+}
+
+.loader-modal {
+  width: min(90%, 520px);
+  border-radius: 18px;
+  border: 1px solid rgba(38, 208, 206, 0.3);
+  background: var(--surface-strong);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.45), 0 0 22px rgba(38, 208, 206, 0.12);
+  padding: clamp(40px, 7vw, 56px) clamp(24px, 4.5vw, 44px);
+  text-align: center;
   display: grid;
   justify-items: center;
-  gap: 10px;
-  border: 1px solid rgba(38, 208, 206, 0.18);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.025);
-  padding: 18px 20px;
+  gap: 12px;
 }
 
-.loading-animation-slot {
-  width: clamp(220px, 34vw, 280px);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.03);
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-
-.loading-animation {
-  width: 100%;
+.loader-modal-video {
+  width: clamp(260px, 36vw, 320px);
+  max-width: 100%;
   height: auto;
-  object-fit: contain;
   display: block;
+  object-fit: contain;
 }
 
-.loading-title {
-  text-align: center;
-  font-weight: 600;
+.loader-modal h3 {
+  font-size: clamp(1.05rem, 2.5vw, 1.3rem);
 }
 
-.loading-caption,
-.loading-fallback {
+.loader-modal p {
+  font-size: 0.94rem;
   color: var(--muted);
-  font-size: 0.9rem;
-  text-align: center;
 }
 
-.loading-fallback {
-  padding: 0 8px;
-}
-
-@media (max-width: 480px) {
-  .loading-animation-slot {
-    width: min(100%, 260px);
+@media (max-width: 640px) {
+  .loader-modal-video {
+    width: clamp(200px, 72vw, 240px);
   }
 }
 
