@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { type ChangeEvent, useState } from 'react';
 
 type RequestState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -63,82 +62,87 @@ export default function DemoPage() {
     }
   };
 
+  const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextFile = event.target.files?.[0] ?? null;
+    setPredictions([]);
+
+    if (!nextFile) {
+      setFile(null);
+      setState('error');
+      setErrorMessage('Пожалуйста, выберите изображение.');
+      return;
+    }
+
+    if (!nextFile.type.startsWith('image/')) {
+      setFile(null);
+      setState('error');
+      setErrorMessage('Нужен файл изображения (JPG, PNG, WebP).');
+      return;
+    }
+
+    setFile(nextFile);
+    setState('idle');
+    setErrorMessage('');
+  };
+
   return (
     <main className="demo-page">
-      <div className="container">
-        <nav className="top-nav" aria-label="Навигация демо">
-          <p className="brand">Распознавание пород собак</p>
-          <Link to="/" className="button button-secondary nav-demo-link">
-            Назад
-          </Link>
-        </nav>
-
+      <div className="demo-container">
         <section className="card-block demo-card">
-          <h1>Демо распознавания</h1>
-          <p className="demo-subtitle">Загрузите изображение собаки и запустите распознавание.</p>
+          <header className="demo-header">
+            <p className="eyebrow">Онлайн-демо</p>
+            <h1>Распознавание пород собак</h1>
+            <p className="demo-subtitle">
+              Загрузите фото собаки, нажмите кнопку распознавания и получите список самых вероятных
+              пород с оценкой уверенности модели.
+            </p>
+          </header>
 
-          <label className="upload-zone" htmlFor="dog-image-upload">
-            <span className="upload-title">Выберите изображение</span>
-            <span className="upload-hint">
-              Поддерживаются форматы JPG, PNG, WebP. Максимальный размер — 5 МБ.
-            </span>
-            <span className="upload-file-name">{file ? file.name : 'Файл пока не выбран'}</span>
-          </label>
+          <div className="demo-content-stack">
+            <label className="upload-zone" htmlFor="dog-image-upload">
+              <span className="upload-title">Загрузите изображение собаки</span>
+              <span className="upload-hint">
+                Перетащите файл в эту область или выберите его вручную. Поддерживаются JPG, PNG,
+                WebP (до 5 МБ).
+              </span>
+              <span className="upload-file-name">{file ? file.name : 'Файл пока не выбран'}</span>
+              {file ? <span className="upload-change-file">Изменить файл</span> : null}
+            </label>
 
-          <input
-            id="dog-image-upload"
-            className="file-input"
-            type="file"
-            accept="image/*"
-            onChange={(event) => {
-              const nextFile = event.target.files?.[0] ?? null;
-              setPredictions([]);
+            <input
+              id="dog-image-upload"
+              className="file-input"
+              type="file"
+              accept="image/*"
+              onChange={onFileChange}
+            />
 
-              if (!nextFile) {
-                setFile(null);
-                setState('error');
-                setErrorMessage('Пожалуйста, выберите изображение.');
-                return;
-              }
+            <div className="recognize-button-wrap">
+              <button
+                type="button"
+                onClick={onRecognize}
+                disabled={state === 'loading'}
+                className="button button-primary recognize-button"
+              >
+                {state === 'loading' ? 'Обработка...' : 'Распознать'}
+              </button>
+            </div>
 
-              if (!nextFile.type.startsWith('image/')) {
-                setFile(null);
-                setState('error');
-                setErrorMessage('Нужен файл изображения (JPG, PNG, WebP).');
-                return;
-              }
+            {state === 'loading' && <p className="status-text">Обработка...</p>}
 
-              setFile(nextFile);
-              setState('idle');
-              setErrorMessage('');
-            }}
-          />
+            {state === 'error' && (
+              <section className="error-block" aria-live="polite" aria-label="Ошибка распознавания">
+                <p>{errorMessage}</p>
+              </section>
+            )}
 
-          <button
-            type="button"
-            onClick={onRecognize}
-            disabled={state === 'loading'}
-            className="button button-primary"
-          >
-            {state === 'loading' ? 'Обработка...' : 'Распознать'}
-          </button>
-
-          {state === 'loading' && <p className="status-text">Обработка...</p>}
-
-          <div aria-live="polite" className="error-area">
-            {state === 'error' && <p>{errorMessage}</p>}
-          </div>
-
-          <div className="results-area">
             {state === 'success' && (
               <section className="result-card" aria-label="Результаты распознавания">
                 <h2>Результат</h2>
                 <ul>
                   {predictions.map((item, index) => (
                     <li key={`${item.label}-${index}`}>
-                      <span>
-                        {index + 1}. {item.label}
-                      </span>
+                      <span className="result-label">{item.label}</span>
                       <strong>{Math.round(item.score * 100) + '%'}</strong>
                     </li>
                   ))}
