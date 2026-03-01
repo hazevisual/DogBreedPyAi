@@ -7,11 +7,14 @@ type Prediction = {
   score: number;
 };
 
+const LOADER_ASSET_PATH = '/src/assets/loader.gif';
+
 export default function DemoPage() {
   const [file, setFile] = useState<File | null>(null);
   const [state, setState] = useState<RequestState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [showLoaderAsset, setShowLoaderAsset] = useState(true);
 
   const onRecognize = async () => {
     if (state === 'loading') {
@@ -83,6 +86,7 @@ export default function DemoPage() {
     setFile(nextFile);
     setState('idle');
     setErrorMessage('');
+    setShowLoaderAsset(true);
   };
 
   return (
@@ -99,7 +103,11 @@ export default function DemoPage() {
           </header>
 
           <div className="demo-content-stack">
-            <label className="upload-zone" htmlFor="dog-image-upload">
+            <label
+              className={`upload-zone ${state === 'loading' ? 'upload-zone-disabled' : ''}`}
+              htmlFor="dog-image-upload"
+              aria-disabled={state === 'loading'}
+            >
               <span className="upload-title">Загрузите изображение собаки</span>
               <span className="upload-hint">
                 Перетащите файл в эту область или выберите его вручную. Поддерживаются JPG, PNG,
@@ -115,7 +123,27 @@ export default function DemoPage() {
               type="file"
               accept="image/*"
               onChange={onFileChange}
+              disabled={state === 'loading'}
             />
+
+            {state === 'loading' && (
+              <section className="loading-block" aria-live="polite" aria-label="Выполняется распознавание">
+                <div className="loading-animation-slot" aria-hidden="true">
+                  {showLoaderAsset ? (
+                    <img
+                      src={LOADER_ASSET_PATH}
+                      alt=""
+                      className="loading-animation"
+                      onError={() => setShowLoaderAsset(false)}
+                    />
+                  ) : (
+                    <span className="loading-fallback">Добавьте frontend/src/assets/loader.gif</span>
+                  )}
+                </div>
+                <p className="loading-title">Нейросеть анализирует изображение...</p>
+                <p className="loading-caption">Обычно это занимает несколько секунд.</p>
+              </section>
+            )}
 
             <div className="recognize-button-wrap">
               <button
@@ -127,8 +155,6 @@ export default function DemoPage() {
                 {state === 'loading' ? 'Обработка...' : 'Распознать'}
               </button>
             </div>
-
-            {state === 'loading' && <p className="status-text">Обработка...</p>}
 
             {state === 'error' && (
               <section className="error-block" aria-live="polite" aria-label="Ошибка распознавания">
